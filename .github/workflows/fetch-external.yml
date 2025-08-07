@@ -23,12 +23,10 @@ jobs:
           cd ..
           rm -rf temp_docs
 
-      - name: Clone community-solved-topics repo
-        run: |
-          echo "Cloning community-solved-topics repo..."
-          rm -rf external_solved_topics
-          git clone https://github.com/simplicitesoftware/community-solved-topics.git external_solved_topics
-          echo "Cloned content:"
-          ls -la external_solved_topics
-          echo "Listing files recursively:"
-          find external_solved_topics
+      - name: Checkout community-solved-topics into subdir
+        uses: actions/checkout@v4
+        with:
+          repository: simplicitesoftware/community-solved-topics
+          path: external_solved_topics
+          ref: main # or "main" if that's the default branch
+

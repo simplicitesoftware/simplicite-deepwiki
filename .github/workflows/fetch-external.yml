@@ -2,8 +2,8 @@ name: Fetch External Content
 
 on:
   schedule:
-    - cron: '0 3 * * *'  # Every day at 03:00 UTC
-  workflow_dispatch:      # Allows manual trigger
+    - cron: '0 3 * * *'  # Daily at 3 AM UTC
+  workflow_dispatch:      # Manual trigger
 
 jobs:
   fetch:
@@ -25,13 +25,10 @@ jobs:
 
       - name: Clone community-solved-topics repo
         run: |
+          echo "Cloning community-solved-topics repo..."
           rm -rf external_solved_topics
-          git clone  https://github.com/simplicitesoftware/community-solved-topics.git external_solved_topics
-          
-      - name: Commit and push changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add external_docs external_solved_topics
-          git commit -m "chore: update external content [CI skip]" || echo "No changes to commit"
-          git push
+          git clone https://github.com/simplicitesoftware/community-solved-topics.git external_solved_topics
+          echo "Cloned content:"
+          ls -la external_solved_topics
+          echo "Listing files recursively:"
+          find external_solved_topics

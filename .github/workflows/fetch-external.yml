@@ -24,9 +24,12 @@ jobs:
           rm -rf temp_docs
 
       - name: Checkout community-solved-topics into subdir
-        uses: actions/checkout@v4
-        with:
-          repository: simplicitesoftware/community-solved-topics
-          path: external_solved_topics
-          ref: main # or "main" if that's the default branch
-
+        run: |
+          rm -rf external_solved_topics
+          mkdir external_solved_topics
+          git clone --depth 1 --filter=blob:none --sparse https://github.com/simplicitesoftware/community-solved-topics.git temp_topics
+          cd temp_topics
+          git sparse-checkout set topics
+          cp -r topics ../external_solved_topics
+          cd ..
+          rm -rf temp_topics

@@ -26,8 +26,8 @@ jobs:
       - name: Clone community-solved-topics repo
         run: |
           rm -rf external_solved_topics
-          git clone --depth 1 https://github.com/simplicitesoftware/community-solved-topics.git external_solved_topics
-
+          git clone --single-branch --branch master https://github.com/simplicitesoftware/community-solved-topics.git external_solved_topics
+          
       - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"

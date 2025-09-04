@@ -8,23 +8,24 @@ Compatibility tables
 
 This document gives a non exhaustive list of architectures and infrastructure components the Simplicité platform is compliant with.
 
-Containers deployments (Docker and PaaS)
-----------------------------------------
+Containers deployments
+----------------------
 
 The **ideal** / **preferred** deployment model is to deploy Simplicité platform as **Docker&reg; container(s)**
-from our standard pre-built images available on [DockerHub](https://hub.docker.com/r/simplicite/) or from custom images that you build to fit your needs.
+from our standard Docker images available or from custom images that you build to fit your needs.
 See [this document](/docs/operation/docker) for details.
 
-It is also possible to deploy it as managed application container(s) on a wide range of platforms as a service (**PaaS**) such as:
+:::info
+Our standard Docker images are built using the **most recent** up-to-date versions of the bellow OS, Java VM and application servers
+for considered Simplicité version.
+:::
 
-- Any CloudFoundry flavor (see. [this document](/docs/operation/cloudfoundry) for details))
-- AWS ElasticBeanstalk (see. [this document](/docs/operation/aws-elasticbeanstalk) for details))
-- Heroku (see. [this document](/docs/operation/heroku) for details))
-- Openshift (see. [this document](/docs/operation/openshift) for details))
-Etc.
-
-In both cases you will need an external database service - custom or as a service (DBaaS).
-See the "Databases" section for details on Simplicité database compliances.
+Note that it is also still possible to deploy it as managed application container(s) on a wide range of platforms as a service (**PaaS**) such as
+CloudFoundry flavor (see. [this document](/docs/operation/cloudfoundry) for details),
+AWS ElasticBeanstalk (see. [this document](/docs/operation/aws-elasticbeanstalk) for details),
+Heroku (see. [this document](/docs/operation/heroku) for details),
+Openshift (see. [this document](/docs/operation/openshift) for details),
+etc.
 
 Custom deployments
 ------------------
@@ -45,7 +46,7 @@ Using such old versions is likely to be a source of potentially tricky problems 
 
 Any OS on which a suitable Java JVM is officially available. This includes:
 
-- all current **Linux distributions** (RedHat&reg;, CentOS&reg;, Fedora&reg;, Debian&reg;, Ubuntu&reg;, etc.) and some proprietary UNIX (Solaris&reg;, etc.),
+- all current **Linux distributions** (RedHat&reg;, CentOS&reg;, Fedora&reg;, Debian&reg;, Ubuntu&reg;, etc.) and some proprietary UNIX (e.g. Solaris&reg;),
 - all current Microsoft **Windows&reg;** versions,
 - all current **MacOS&reg;** versions,
 - etc.
@@ -56,26 +57,24 @@ Our **recommended** OS family for production is Linux.
 
 The OS can run either on **physical** or **virtual** servers or in Docker&reg; **containers**.
 
-It is also possible to deploy Simplicité platform on **PaaS** buildpacks CloudFoundry&reg;, Heroku&reg;, OpenShift&reg;, etc.
-
 ### Java VM
 
 The following table only indicates the **LTS (Long Term Support)** JVM versions.
 
-| ![](https://platform.simplicite.io/logos/logo125.png) | JVM 1.8 | JVM 11  | JVM 17  | JVM 21  |
-|:-----------------------------------------------------:|---------|---------|---------|---------|
-| Alpha 7.0                                             | no      | no      | yes (1) | **yes** |
-| Alpha 6.3 and **6.2**                                 | no      | no      | yes (1) | **yes** |
-| Legacy 6.x                                            | no      | yes (1) | yes (1) | **yes** |
-| **5.3** and legacy 5.x                                | no      | yes (1) | **yes** | yes (1) |
-| Legacy 4.0                                            | no      | yes (1) | **yes** | yes (1) |
-| Legacy 3.2                                            | yes (1) | **yes** | yes (1) | yes (1) |
-| Legacy 3.1                                            | yes (1) | **yes** | yes (1) | yes (1) |
-| Legacy 3.0                                            | **yes** | no      | no      | no      |
+| ![](https://platform.simplicite.io/logos/logo125.png) | JVM 1.8 | JVM 11  | JVM 17  | JVM 21  | JVM 25  |
+|:-----------------------------------------------------:|---------|---------|---------|---------|---------|
+| Alpha 7.0                                             | no      | no      | yes (1) | yes (1) | **yes** |
+| Alpha 6.3 and **6.2**                                 | no      | no      | yes (1) | **yes** | yes (1) |
+| Legacy 6.x                                            | no      | yes (1) | yes (1) | **yes** | yes (1) |
+| **5.3** and legacy 5.x                                | no      | yes (1) | **yes** | yes (1) | yes (1) |
+| Legacy 4.0                                            | no      | yes (1) | **yes** | yes (1) | yes (1) |
+| Legacy 3.2                                            | yes (1) | **yes** | yes (1) | yes (1) | yes (1) |
+| Legacy 3.1                                            | yes (1) | **yes** | yes (1) | yes (1) | yes (1) |
+| Legacy 3.0                                            | **yes** | no      | no      | no      | no      |
 
 1. Not tested and not supported but should work.
 
-In **bold** the current Simplicité maintained minor version for considered major version.
+In **bold** the current and maintained Simplicité minor version for considered major version.
 
 > **Note**: Whichever JVM version you use, you **MUST** always use its **up-to-date release**.
 > Only these up-to-date releases are tested and supported.

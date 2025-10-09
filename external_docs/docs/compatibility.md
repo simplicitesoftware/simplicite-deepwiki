@@ -4,7 +4,7 @@ title: Compatibility
 ---
 
 Compatibility tables
-=================
+====================
 
 This document gives a non exhaustive list of architectures and infrastructure components the Simplicité platform is compliant with.
 
@@ -12,11 +12,12 @@ Containers deployments
 ----------------------
 
 The **ideal** / **preferred** deployment model is to deploy Simplicité platform as **Docker&reg; container(s)**
-from our standard Docker images available or from custom images that you build to fit your needs.
+from our standard Docker images available (or from custom images that you build to fit your need).
+
 See [this document](/docs/operation/docker) for details.
 
 :::info
-Our standard Docker images are built using the **most recent** up-to-date versions of the bellow OS, Java VM and application servers
+Our standard Docker images are built using the **most recent** up-to-date versions of the underlying OS, Java VM and Tomcat server
 for considered Simplicité version.
 :::
 
@@ -30,7 +31,7 @@ etc.
 Custom deployments
 ------------------
 
-It is still possible, although highly **discouraged**, to deploy Simplicité on custom IaaS infrastructures or even on premises servers.
+It is still possible, although **discouraged**, to deploy Simplicité manually without using our Docker images.
 In such a case you need to verify that your technical platform complies with the following recommendations.
 
 ### Introduction

@@ -73,7 +73,7 @@ In order to properly manipulate and customize your Simplicité applications, it 
 
 * **MENU -** contains all your application's sections, with sub-menus and categories, it helps you to intuitively navigate through your applications. You can also embed specific features and categories (trays, typed items, ...).
 
-* **WORK -** this represents the main area of interest, where all dynamic content is displayed, indeed it is the biggest one. That's where any of your search or navigation result will appear and be interactible with.
+* **WORK -** the main content area where dynamic content is displayed and where search results and navigation content appears. This is the largest section of the interface where users interact with data and functionality.
 
 * **FOOTER -** this last parts serves to add some specific links that less users would access but that are still mandatory, like Legal Mentions and Accessibility features.
 
@@ -101,5 +101,5 @@ Don't hesitate to also check on other lessons that are relevant for the presente
 * [*Core Javascript (Documentation)*](/docs/core/javascript-code-examples)
 * [*Interface tool `$ui` (Documentation)*](/docs/core/ui-tools-code-examples)
 * [*Custom Services through External Objects (Documentation)*](/docs/integration/webservices/custom-services)
-* [*Ajax API (Documentation)*](/docs/integration/librairies/ajax-api)
+* [*Ajax API (Documentation)*](/docs/integration/libraries/ajax-api)
 * [*Simplicité NPM Javascript API Doc*](https://simplicitesoftware.github.io/javascript-api/)

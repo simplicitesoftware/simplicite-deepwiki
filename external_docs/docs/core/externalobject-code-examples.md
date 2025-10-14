@@ -156,7 +156,7 @@ The responsive UI requires a JavaScript statement (even empty like above) to be 
 
 ![](img/externalobject-code-examples/externalobject-code-examples-3.png)
 
-> **Note**: If you return a plain string it will be rendered as a **legacy page** (displayed in an iframe for backward compatiblity).
+> **Note**: If you return a plain string it will be rendered as a **legacy page** (displayed in an iframe for backward compatibility).
 
 See [this section](/docs/core/externalobject-code-examples#responsive-ui) for other examples dedicated to the responsive UI.
 
@@ -286,7 +286,7 @@ As indicated above, the Ajax APIs JavaScripts are included by default in the **s
 * using dedicated APIs of the web helper classes in **non standard** pages, e.g. using `wp.appendAjax()`
 where `wp` is an instance of a sub class of `com.simplicite.webapp.web.WebPage`
 
-The usage of the Ajax APIs itself is described in details in another [document](/docs/integration/librairies/ajax-api). Here is just a simple **standard** page example:
+The usage of the Ajax APIs itself is described in details in another [document](/docs/integration/libraries/ajax-api). Here is just a simple **standard** page example:
 
 **Java**
 
@@ -685,7 +685,7 @@ var MyExtObject = (function() {
 As of version 4.0.P24 in Java it is preferable to use the higher level helper class `com.simplicite.webapp.web.ResponsiveExternalObject`
 which, by default, calls a client-side `<external object name>.render(params)` function passing it the request parameters as a JSON object.
 
-In most cases it is sufficient to make the external object's calss extend the above helper class:
+In most cases it is sufficient to make the external object's class extend the above helper class:
 
 ```java
 public class MyExtObject extends com.simplicite.webapp.web.ResponsiveExternalObject {

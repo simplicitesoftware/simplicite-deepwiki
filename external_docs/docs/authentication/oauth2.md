@@ -130,11 +130,13 @@ Example `AUTH_PRODIDERS` configuration (refer to the [auth providers doc](auth-p
 			"title":     { "field": "usr_title", "transform": { "M.":"MR", "Mme":"MRS", "Mlle":"MS" } },
 			"unit":      { "field": "myUserUnit", "param": "APP_USER_UNIT" }
 		},
+		/* OR
+		"jwt_claims_mappings": {
+			"login": "username"
+			(...)
+		},*/
 		"jwt_issuer": "<url>",
 		"jwt_secret": "",
-		"jwt_claims_mappings": {
-			"login": "preferred_username"
-		},
 		"jwt_check_nonce": true
 	}
 	(...)
@@ -174,6 +176,8 @@ Beyond the common OAuth2 settings, there are some additional system parameters t
 | `redirect_url` | optional | defaults to `instance_url/oauth2callback` | v4.0 |
 | `client_credentials_mode` | optional | defaults to `authheader` for Basic (Authorization header), should be `params` for HTTP POST method | v4.0 |
 | `userinfo_mappings` | optional | user info fields to use as instead of standard fields defined by the OIDC standards, the value is a JSON object (e.g. `{ "login": "uid", "firstname": "first_name", "lastname": "last_name", "email": "email_address", "phone": "mobile_phone, "lang": "preferred_language"}` to map the defaults which are respectively `sub`, `given_name`, `family_name`, `email`, `phone_number` and `locale`) | v4.0 |
+| `tokeninfo_mappings` | optional | Same as above but for a custom token info endpoint | v5.3 |
+| `jwt_claims_mappings` | optional | Same as above but for ID token claims | v5.3 |
 | `pkce_challenge_method` | optional | to enable PKCE flow, possible values are `S256` or `plain` (if absent PKCE is disabled) | v5.2.30 |
 | `pkce_code_verifier_length` | optional | to define the length of the PKCE code verifier, defaults to `64` | v5.2.30 |
 | `non_ssl_urls_allowed` | optional | to allow using non SSL URLs (Note that this does not comply with OAuth2/OpenIDConnect standards, it should never be used unless absolutely required) | v5.2.32 |

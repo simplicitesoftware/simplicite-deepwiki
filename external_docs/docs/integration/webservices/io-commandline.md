@@ -3,77 +3,111 @@ sidebar_position: 10
 title: I/O services
 ---
 
-I/O services for command line interface (`/io`)
-=================================================
+I/O services for command line interface
+=======================================
 
-As of **version 3.0**, usual administrative tasks can be done using the `curl` command line tool using the I/O endpoint.
+The `/io` endpoint is designed to execute usual operation tasks in a CLI, without using the UI.
 
-> **Note**: in version 3.x adding `-b cookies.txt -c cookies.txt` as arguments of the `curl` calls is **required**
-> as they allow to re-use the same server session (identified by the `JSESSIONID` cookie).
-> In versions 4.0+ a technical session is used to avoid taking care of the session cookie.
+:::warning
+In production the I/O endpoint should be restricted only to allowed origins (e.g. using filtering on request's origin IP address or similar approaches).
+:::
 
-As of **version 3.1**, the I/O endpoint supports either I/O authentication (using the I/O password stored in a `EAI <login>:<password>` system parameter, in this case `<credentials>` is `-u <login>[:<I/O password>]`)
-or the API endpoint authentication mechanisms described in [this document](/docs/integration/webservices/services-auth) (in this case `<credentials>` are API endpoint authentication headers).
-
-As of **version 4.0.P22**, the I/O endpoint does not any longer support API authentication, to use such API authentication you now need to use the I/O service deployed on the API endpoint.
-
-As of **version 5**, the I/O endpoint allows passing a dedicated password as the `io.password` JVM argument or the `IO_PASSWORD` environment parameter
-(which can contain either a plain text password - not recommended - or a non salted hashed password using the configured hashing algorithm)
-instead of the legacy (and rather unsecure) `EAI *` system parameters.
-
-> **Warning**: In production the I/O endpoint should be restricted only to allowed origins (e.g. using filtering on request's origin IP address or similar approaches).
-
-Rights <span id="rights"></span>
---------------------------------
-
-The I/O interface uses, by default, the `system` pseudo user which is only granted the `ADMIN` group, and thus only the groups being part of the `ADMIN` group's profile.
-
-If you get "Object ... not granted" messages, make sure the considered object is allowed to at least one of the groups of the `ADMIN` group profile.
-
-Standard formats <span id="formats"></span>
--------------------------------------------
-
-The standard formats used by the standard I/O imports/exports are described in [this document](/docs/integration/webservices/standard-formats)
-
-I/O URL <span id="url"></span>
-------------------------------
+I/O URL
+-------
 
 The `<I/O URL>` used in `curl` commands below is the one available on the I/O endpoint: `http[s]://<host[:port]>[/<app root>]/io`.
 
 As of **version 4.0.P22** it can also be one available on the API endpoint `http[s]://<host[:port]>[/<app root>]/api/io`
 
-> **Note**: all requests to these URL **must** use the `POST` method with multipart for data (this is what does the `--form` arguments passed to the `curl` commands)
+:::note
+All requests to these URL **must** use the `POST` method with multipart for data
+(this is what does the `--form` arguments passed to the `curl` commands)
+:::
 
-Imports <span id="imports"></span>
-----------------------------------
+Authentication
+--------------
 
-To import a file `<file>` the command is:
+Access to the `/io` endpoint is granted by passing credentials the endpoint, which will be referred
+to with the `<credentials>` placeholder in the rest of this document. Those credentials can be of different types:
+
+- standard access:
+  - `-u <login>:<password>`
+  - a simple login and password of an active user in the platform
+  - the user must not have a `FORCE_CHANGE_PASSWORD` flag (as it is the case for designer on a fresh install)
+- a dedicated I/O password
+  - `-u designer:<password>` (works only for the **designer** user)
+  - passed as
+    - a JVM argument `io.password`
+    - an environment variable `IO_PASSWORD`
+    - [legacy/unsafe] a system parameter `EAI <login>`
+  - either in plain text, or hashed with the algorithm specified in `HASH_PASSWORD`
+- API access
+  - `-H "X-Simplicite-Authorization: Bearer $TOKEN"`, cf [API auth](/docs/integration/webservices/services-auth) first
+  - on the `/api/io` endpoint
+
+You can test it by using the following command:
+
+```text
+curl <credentials> --form "file=" <I/O URL>
+```
+
+Rights
+------
+
+The I/O interface uses, by default, the `system` pseudo user which is only granted the `ADMIN` group,
+and thus only the groups being part of the `ADMIN` group's profile.
+
+If you get "Object ... not granted" messages, make sure the considered object is allowed to
+at least one of the groups of the `ADMIN` group profile.
+
+Standard formats
+----------------
+
+The standard formats used by the standard I/O imports/exports are described in [this document](/docs/integration/webservices/standard-formats)
+
+Imports
+-------
+
+To import data from a file `<file>` the command is:
 
 ```text
 curl <credentials> --form service=<import command> --form file=@<file> [<extra parameters>] <I/O URL>
 ```
 
+:::note
+
+- The data to import can also be retrieved on the server side from an URL passed like this `--form url=<url>`.
+- The data to import can also be submitted as raw data using `--form data=<raw data>`
+
+:::
+
 Where `<import command>` is one of :
 
-- `xmlimport` : import a **standard XML** file (no extra parameter required)
-- `zipimport` : import a **standard ZIP** file (no extra parameter required)
-- `csvimport` : import a single object's **standard CSV** file with `<extra parameters>` = `--form object=<object name>`
-- `adpimport` : import a custom file using an adapter with `<extra parameters>` = `--form adapter=<adapter name>`
-- `moduleimport` : import a **standard XML/JSON or ZIP/tar.gz** using module strategy file with `<extra parameters>` = `--form module=<module name> --form version=<module version> --form zip=<true|false>` (restricted to users who have a responsibility on the `ADMIN` group)
-	- an optional extra parameter can be set the diff mode import: `--form diff=<true|false>` (defaults to `true`)
-- `modulesimport` (as of **version 5**) : import a set of modules (with optional datasets loading and unit tests execution) described by an **importspec**
-  (this applies the same version-driver logic as the one used during the startup's importspec phase)
-- `sqlscript` : execute a SQL script (no extra parameter required, restricted to users who have a responsibility on the `ADMIN` group)
+- `xmlimport`: import a **standard XML** file
+- `jsonimport`: import a **standard JSON** file
+- `zipimport`: import a **standard ZIP** file
+- `csvimport`: import a single object's **standard CSV** file with mandatory `<extra parameters>` = `--form object=<object name>`
+- `adpimport`: import a custom file using an adapter with mandatory `<extra parameters>` = `--form adapter=<adapter name>`
 
-The file can also be designated by a URL then the `--form file=@<file>` is to be changed to `--form url=@<url>`.
+And for the users having a responsibility on the `ADMIN` group:
+
+- `moduleimport`: import a **standard XML/JSON or ZIP/tar.gz** using module strategy file
+  with mandatory `<extra parameters>` = `--form module=<module name> --form version=<module version> --form zip=<true|false>`
+  - an optional extra parameter can be set to use the diff mode import: `--form diff=<true|false>` (defaults to `true`)
+- `modulesimport` (note the `modules` with an `s`): import a set of modules described by an **import specification**,
+  the `file` parameter is here a JSON or YAML file using the same syntax as the one used during the startup's import specification phase,
+  see [this document](/docs/operation/auto-setup/#import-spec) for details on the import specification syntax.
+- `sqlscript`: execute a SQL script
 
 - An optional extra parameter can be set to get processing logs or not: `--form log=<true|false>` (defaults to `false`)
 - An optional extra parameter can be set to indicate processing logs output format: `--form output=<plain|xml>` (defaults to `plain`)
 
-> **Note**: the standard XML, ZIP and CSV formats are described [here](/docs/integration/webservices/standard-formats)
+:::note
+The standard formats are described [in this document](/docs/integration/webservices/standard-formats).
+:::
 
-Exports <span id="exports"></span>
-----------------------------------
+Exports
+-------
 
 To export data in a file `<file>` the command is:
 
@@ -84,25 +118,31 @@ curl <credentials> --form service=<export command> -o <file> [<extra parameters>
 Where `<export command>` is one of :
 
 - `xmlexport`: export an object data to a **standard XML** file with `<extra parameters>` = `--form object=<object name>`
-	- an optional  extra parameter can be set to inline documents and images as Base64 strings in the XML file: `--form inlinedocs=<true|false>` (default is `false`)
+  - an optional  extra parameter can be set to inline documents and images as Base64 strings
+    in the XML file: `--form inlinedocs=<true|false>` (default is `false`)
+- `jsonexport`: export an object data to a **standard JSON** file with `<extra parameters>` = `--form object=<object name>`
+  - an optional  extra parameter can be set to inline documents and images as Base64 strings
+    in the JSON file: `--form inlinedocs=<true|false>` (default is `false`)
 - `zipexport`: export an object data to a **standard ZIP** file with `<extra parameters>` = `--form object=<object name>`
 - `csvexport`: export an object data to a **standard CSV** file with `<extra parameters>` = `--form object=<object name>`
-- `moduleexport`: export module configuration to a standard XML file with `<extra parameters>` = `--form module=<module name>` (restricted to users who have a responsibility on the `ADMIN` group
-	- an optional extra parameter can be set to indicate the output format: `--form zip=<true|false>` (defaults to `false`)
-	- an optional extra parameter can be set to inline documents and images as Base64 strings in the XML file: `--form inlinedocs=<true|false>` (default is `false`, `true` does not make sense in case of ZIP export)
-- `moduleexportdata` (as of **version 4.0**): export data of all module business objects marked with an export order in **standard XML** format (restricted to users who have a responsibility on the `ADMIN` group
+
+And for the users having a responsibility on the `ADMIN` group:
+
+- `moduleexport`: export module configuration to a standard XML file with `<extra parameters>` = `--form module=<module name>`
+  (restricted to users who have a responsibility on the `ADMIN` group)
+  - an optional extra parameter can be set to indicate the output format: `--form zip=<true|false>` (defaults to `false`)
+  - an optional extra parameter can be set to inline documents and images as Base64 strings in the XML file: `--form inlinedocs=<true|false>`
+    (default is `false`, `true` does not make sense in case of ZIP export)
+- `moduleexportdata` (as of **version 4.0**): export data of all module business objects marked with an export
+  order in **standard XML** format (restricted to users who have a responsibility on the `ADMIN` group)
   Note that this service is primarily dedicated to export small amounts of reference and/or dev/test data as a complement to the module configuration.
 
-<!--
-**********************************************
-TODO: arguments for various formats (XML/JSON)
-**********************************************
--->
+:::note
+The standard formats are described [in this document](/docs/integration/webservices/standard-formats).
+:::
 
-> **Note**: the standard XML, ZIP and CSV formats are described [here](/docs/integration/webservices/standard-formats)
-
-Git <span id="git"></span>
---------------------------
+Git
+---
 
 As of **version 3.2**, to do a Git commit on a module, the command is:
 
@@ -110,10 +150,10 @@ As of **version 3.2**, to do a Git commit on a module, the command is:
 curl <credentials> --form service=modulecommit --form module=<module name> --form message="<commit message>" <I/O URL>
 ```
 
-Others <span id="others"></span>
---------------------------------
+Others
+------
 
-### Clear cache <span id="clearcache"></span>
+### Clear cache
 
 To flush server-side cache, the command is:
 
@@ -121,7 +161,7 @@ To flush server-side cache, the command is:
 curl <credentials> --form service=clearcache <I/O URL>
 ```
 
-### Purge tasks <span id="purge"></span>
+### Purge tasks
 
 Various purge tasks can be processed using following commands:
 
@@ -131,20 +171,20 @@ curl <credentials> --form service=<purge command> <I/O URL>
 
 Where `<purge command>` is one of:
 
-- `purgelogs` : purge logs
-- `purgejobs` : purge cron jobs
-- `purgesupervisions` : purge import supervisions entries
-- `purgerecyclebin` : purge documents recycle bin
-- `purgeexports` : purge exports
-- `purgetempfiles` : purge temporary files
-- `purgenodes` : purge nodes (as of version 6.3)
+- `purgelogs`: purge logs
+- `purgejobs`: purge cron jobs
+- `purgesupervisions`: purge import supervisions entries
+- `purgerecyclebin`: purge documents recycle bin
+- `purgeexports`: purge exports
+- `purgetempfiles`: purge temporary files
+- `purgenodes`: purge nodes (as of version 6.3)
 
-As of version 5.2 for `purgelogs`, `purgejobs`and `purgesupervisions` an additional parameter `depth` allows to preserve the latest records:
+For `purgelogs`, `purgejobs`and `purgesupervisions` an additional parameter `depth` allows to preserve the latest records:
 
 - If `depth` is **negative** it gives the number of days of records to keep (e.g. `depth=-7`: delete all except last week's records)
 - If `depth` is **positive** it gives the number of records to keep (e.g. `depth=100`: delete all except the last 100 records)
 
-### Indexation <span id="indexation"></span>
+### Indexation
 
 To force indexation to be (re)built, the command is:
 
@@ -152,64 +192,55 @@ To force indexation to be (re)built, the command is:
 curl <credentials> --form service=buildindex <I/O URL>
 ```
 
-### Unit tests <span id="unittests"></span>
+### Unit tests
 
-To run a **business object**'s unit tests, the command is:
-
-```text
-curl <credentials> --form service=unittests --form object=<business object name> <I/O URL>
-```
-
-To run an **external object**'s unit tests, the command is:
-
-```text
-curl <credentials> --form service=unittests --form extobject=<external object name> <I/O URL>
-```
-
-To run a **business process**'s unit tests, the command is:
-
-```text
-curl <credentials> --form service=unittests --form process=<business process name> <I/O URL>
-```
-
-As of **version 5.1**, to run all tests from a **test shared code**, the command is:
+To run all tests from a **test shared code**, the command is:
 
 ```text
 curl <credentials> --form service=unittests --form test=<test shared code name> <I/O URL>
 ```
 
-As of **version 5.3**, to run all unit tests shared codes of a **module**, the command is:
+To run all unit tests shared codes of a **module**, the command is:
 
 ```text
 curl <credentials> --form service=unittests --form module=<module name> <I/O URL>
 ```
 
-As of **version 5.3**, the importspec syntax can also be used, the command is:
+To run all unit tests shared codes defined using an **import specification** file
+(where only `module` and `unittests` must be defined), the command is:
 
 ```text
-curl <credentials> --form service=unittests --form file=@<file> <I/O URL>
+curl <credentials> --form service=unittests --form file=<import spec file> <I/O URL>
 ```
 
-Where the content of `<file>` is a JSON importspec (or its YAML equivalent) like:
+:::note
+Some deprecated unit testing mechanisms can still be run although they **should**
+be refactored as **test shared code**.
 
-```json
-{
-	"modules": [
-		{
-			"name": "<module name>",
-			"unittests": true
-				|| "<shared code name>"
-				|| [ "<shared code names>" ]
-		},
-		...
-	]
-}
+To run a **deprecated** business object's unit tests, the command is:
+
+```bash
+curl <credentials> --form service=unittests --form object=<business object name> <I/O URL>
 ```
 
-### Logs <span id="logs"></span>
+To run a **deprecated** external object's unit tests, the command is:
+
+```bash
+curl <credentials> --form service=unittests --form extobject=<external object name> <I/O URL>
+```
+
+To run a **deprecated** business process's unit tests, the command is:
+
+```bash
+curl <credentials> --form service=unittests --form process=<business process name> <I/O URL>
+```
+
+:::
+
+### Logs
 
 To retrieve the server logs, the command is:
 
-```text
+```bash
 curl <credentials> --form service=logs <I/O URL>
 ```

@@ -30,7 +30,7 @@ Adjust `LANG` environment variable to appropriate value (e.g. `en_US.UTF8` for U
 
 Set appropriate timezone (change `Europe/Paris` to your timezone):
 
-```bash
+```shell
 rm /etc/localtime
 ln -s /usr/share/zoneinfo/Europe/Paris /etc/localtime
 ```
@@ -39,13 +39,13 @@ ln -s /usr/share/zoneinfo/Europe/Paris /etc/localtime
 
 Install the NTP daemon:
 
-```bash
+```shell
 yum install ntp
 ```
 
 Enable and start it:
 
-```bash
+```shell
 systemctl enable ntpd.service
 systemctl start ntpd.service
 ```
@@ -54,27 +54,27 @@ systemctl start ntpd.service
 
 Install a entropy generator (useful for all random-related stuff including SSL and Tomcat's sessions)
 
-```bash
+```shell
 yum install epel-release
 yum install haveged
 ```
 
 Enable it and start it:
 
-```bash
+```shell
 systemctl enable haveged
 systemctl start haveged
 ```
 
 ### OpenJDK
 
-```bash
+```shell
 yum install java-latest-openjdk [java-latest-openjdk-devel]
 ```
 
 Check (or change) the Java version used by the server:
 
-```bash
+```shell
 alternatives --config java
 ```
 
@@ -82,7 +82,7 @@ alternatives --config java
 
 Install Ant from Apache website as distribution's version is quite old and has too many dependencies
 
-```bash
+```shell
 wget http://www-eu.apache.org/dist/ant/binaries/apache-ant-1.10.1-bin.tar.gz
 sudo mv apache-ant-1.10.1 /opt/
 tar xvfz apache-ant-1.10.1-bin.tar.gz
@@ -110,13 +110,13 @@ Nothing to do (HSQLDB JAR is part of the application's libraries)
 
 Install the server and the JDBC driver:
 
-```bash
+```shell
 yum install mariadb-server mysql-connector-java
 ```
 
 Or on older distributions providing MySQL instead of MariaDB:
 
-```bash
+```shell
 yum install mysql-server mysql-connector-java
 ```
 
@@ -127,7 +127,7 @@ in `/etc/my.cnf` (in section `[mysqld]`)
 
 Install the server and the JDBC driver:
 
-```bash
+```shell
 yum install postgresql-server postgresql-jdbc
 ```
 
@@ -135,13 +135,13 @@ yum install postgresql-server postgresql-jdbc
 
 Create a dedicated account:
 
-```bash
+```shell
 useradd simplicite
 ```
 
 Connect this account:
 
-```bash
+```shell
 su - simplicite
 ```
 
@@ -160,7 +160,7 @@ Then, make sure the `tomcat/logs` folder is present and writeable, this is **man
 
 Add aliases in the `simplicite` user's `.bashrc` or in a global `/etc/profile.d/simplicite.sh` :
 
-```bash
+```shell
 alias vi=vim
 alias rm='rm -i'
 alias cp='cp -i'
@@ -177,14 +177,18 @@ export ANT_OPTS="$ANT_OPTS -Dtomcat.root=$TOMCAT_ROOT -Dtomcat.host=localhost -D
 
 Optionally, you can add extra useful packages (back as `root`):
 
-	yum install vim git wget lynx nmap ...
+```shell
+yum install vim git wget lynx nmap ...
+```
 
 Option 1 - Expose Tomcat using an Apache AJP reverse proxy
 ----------------------------------------------------------
 
 As `root`, install apache with SSL module :
 
-	yum install httpd mod_ssl
+```shell
+yum install httpd mod_ssl
+```
 
 Add this to `/etc/httpd/conf/httpd.conf` for an HTTP endpoint:
 
@@ -202,14 +206,20 @@ This corresponds to the following configuration:
 
 Enable and start Apache:
 
-	systemctl enable httpd.service
-	systemctl start httpd.service
+```shell
+systemctl enable httpd.service
+systemctl start httpd.service
+```
 
-> **Note**: if you get HTTP `503` error on this page you can try running the following command as `root`: `chcon -Rt httpd_sys_content_t /var/www`
+:::note
+
+If you get HTTP `503` error on this page you can try running the following command as `root`: `chcon -Rt httpd_sys_content_t /var/www`
+
+:::
 
 Create `/etc/init.d/tomcat` script with following content:
 
-```bash
+```shell
 #!/bin/sh
 #
 # Tomcat Control Script
@@ -252,22 +262,32 @@ Adjust `JAVA_OPTS` to suitable settings for your environment.
 
 Make this script executable:
 
-	chmod +x /etc/init.d/tomcat
+```shell
+chmod +x /etc/init.d/tomcat
+```
 
 Enable and start Tomcat:
 
-	chkconfig tomcat on
-	/etc/init.d/tomcat start
+```shell
+chkconfig tomcat on
+/etc/init.d/tomcat start
+```
 
 Option 2 - Expose Tomcat using a NGINX HTTP reverse proxy
 ---------------------------------------------------------
 
 As `root`, install NGINX :
 
-	yum install epel-release
-	yum install nginx
+```shell
+yum install epel-release
+yum install nginx
+```
 
-> **Note**: check [this page](http://wiki.nginx.org/Install) for details on NGINX installation
+:::note
+
+Check [this page](http://wiki.nginx.org/Install) for details on NGINX installation
+
+:::
 
 Add a new `tomcat.conf` configuration file in `/etc/nginx/conf.d` with following content:
 
@@ -344,9 +364,11 @@ E.g. for a monitoring tool whose user agent starts with `MyMonitorTool` you can 
 
 Change/add these configuration items in the main NGINX configuration file as `root`:
 
-	vi /etc/nginx/nginx.conf
-
+```shell
+vi /etc/nginx/nginx.conf
 ```
+
+```nginx
 http {
 (...)
 	client_max_body_size 100M;
@@ -359,13 +381,20 @@ http {
 
 Enable and start NGINX:
 
-	systemctl enable nginx.service
-	systemctl start nginx.service
+```shell
+systemctl enable nginx.service
+systemctl start nginx.service
+```
 
 The rest is the same as above for Apache.
 
-> **Note**: SELinux may be causing HTTP `502` errors, check [this post](http://stackoverflow.com/questions/27435655/nginx-proxy-pass-not-working-in-selinux) for a solution that works.
-> A quick solution being to run the following command as `root`: `setsebool httpd_can_network_connect 1 -P`
+:::note
+
+*SELinux may be causing HTTP `502` errors, check [this post](http://stackoverflow.com/questions/27435655/nginx-proxy-pass-not-working-in-selinux)
+for a solution that works.
+A quick solution being to run the following command as `root`: `setsebool httpd_can_network_connect 1 -P`
+
+:::
 
 Option 3 - Expose Tomcat using the xinetd daemon
 ------------------------------------------------
@@ -376,7 +405,7 @@ In this case Apache and/or NGINX **must** be inhibited.
 
 As `root`, install xinetd :
 
-```bash
+```shell
 yum istall xinetd
 ```
 
@@ -412,7 +441,7 @@ This corresponds to the following configuration:
 
 Enable and start xinetd:
 
-```bash
+```shell
 systemctl enable xinetd
 systemctl start xinted
 ```
@@ -428,13 +457,13 @@ In this case Apache and/or NGINX **must** be inhibited.
 
 As `root`, install the gcc compiler:
 
-```bash
+```shell
 yum install gcc make
 ```
 
 Compile `jsvc`:
 
-```bash
+```shell
 cd tomcat/bin
 tar xvfz commons-daemon-native.tar.gz
 cd commons-daemon-x.y.z-native-src/unix
@@ -461,7 +490,7 @@ This corresponds to the following configuration:
 
 Create `/etc/init.d/tomcat` script with following content:
 
-```bash
+```shell
 #!/bin/sh
 #
 # Tomcat for Control Script
@@ -508,13 +537,13 @@ Adjust `JAVA_OPTS` to suitable settings for your environment.
 
 Make this script executable:
 
-```bash
+```shell
 chmod +x /etc/init.d/tomcat
 ```
 
 Enable and start Tomcat:
 
-```bash
+```shell
 chkconfig tomcat on
 /etc/init.d/tomcat start
 ```

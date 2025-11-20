@@ -7,7 +7,9 @@ Simplicité Instances Manager for AlmaLinux
 ==========================================
 
 :::info
+
 This document applies to the Simplicité Instances Manager (SIM) software for **AlmaLinux 8, 9 or 10**.
+
 :::
 
 Introduction
@@ -344,7 +346,7 @@ exit
 
 **Linux**:
 
-```bash
+```shell
 #!/bin/bash
 
 export JAVA_HOME=<path to your JDK home, e.g. `pwd`/jdk-1.8.0>
@@ -721,7 +723,7 @@ in the `licensekeys` folder located in the base `$APPS_HOME` folder,
 if present this file is loaded on the instance's  I/O endpoint using the appropriate credentials
 (which are available as environment variables):
 
-```bash
+```shell
 #!/bin/bash
 
 XML=$APPS_HOME/licensekeys/license-$USER.xml
@@ -879,7 +881,7 @@ The following parameters only applies to the upgrade action (manual or automatic
 
 Note that other Oracle-related environment variable can be set here if not set otherwise, e.g:
 
-```bash
+```shell
 ORACLE_HOME=/u01/app/oracle/product/11.2.0/xe
 LD_LIBRARY_PATH=${ORACLE_HOME}/lib:${LD_LIBRARY_PATH}
 SQLPATH=${ORACLE_HOME}/lib:${SQLPATH}
@@ -897,7 +899,7 @@ ORACLE_SID=XE
 
 Note that other SQLServer-related environment variable can be set here if not set otherwise:
 
-```bash
+```shell
 MSSQL_HOME=/opt/mssql-tools
 PATH=${MSSQL_HOME}/bin:${PATH}
 ```

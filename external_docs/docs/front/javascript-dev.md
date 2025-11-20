@@ -7,15 +7,21 @@ Javascript Development
 ======================
 
 :::warning
+
 This documentation is part of the **Frontend Development** category, designed to guide you through frontend customization within Simplicité.
+
 :::
 
 This guide covers JavaScript usage in Simplicité for custom interactions and external objects.
 
-:::tip Quick Tips
+:::tip
+
+Quick Tips:
+
 - Align customizations with Simplicité's best practices for compatibility
 - Keep JavaScript modular and maintainable
 - Check if Simplicité's native features can achieve your goal before writing custom code
+
 :::
 
 JavaScript in Simplicité serves two main scenarios:
@@ -23,11 +29,12 @@ JavaScript in Simplicité serves two main scenarios:
 1. **Custom Application**: Connect to Simplicité using the NPM Library
 2. **Custom Elements**: Create widgets/pages integrated via External Objects
 
-# NPM Library
+NPM Library
+-----------
 
 The [Simplicité NPM library](https://www.npmjs.com/package/simplicite) provides a JavaScript API for both frontend and backend contexts.
 
-## Basic Usage
+### Basic Usage
 
 ```javascript
 import simplicite from 'simplicite';
@@ -35,12 +42,12 @@ import simplicite from 'simplicite';
 const app = simplicite.session({ url: '<instance URL>' });
 
 try {
-  const user = await app.login({ 
-    username: '<username>', 
-    password: '<password>' 
+  const user = await app.login({
+    username: '<username>',
+    password: '<password>'
   });
   console.log('Hello ' + user.login + '!');
-  
+
   const obj = app.getBusinessObject('MyObject');
   const list = await obj.search();
   // Work with results
@@ -49,33 +56,36 @@ try {
 }
 ```
 
-## Key Features
+### Key Features
 
 - **Authentication**: Manage user sessions programmatically
 - **Object Handling**: CRUD operations on Business Objects
 - **Ajax Calls**: Communicate with Simplicité's backend
 - **Utilities**: Helper methods for logging and debugging
 
-## Project Setup
+### Project Setup
 
 1. Create project directory and initialize:
-```bash
-npm init -y
-npm install simplicite express
-```
+
+   ```shell
+   npm init -y
+   npm install simplicite express
+   ```
 
 2. Create directory structure:
-```
-CustomFront/
-  public/
-    style.css
-  views/
-    index.html
-  app.js
-  package.json
-```
 
-## Example: Product Display
+   ```text
+   CustomFront/
+     public/
+       style.css
+     views/
+       index.html
+     app.js
+     package.json
+   ```
+
+Example: Product Display
+------------------------
 
 ### Simplicité Configuration
 
@@ -108,8 +118,8 @@ server.use(express.static(dir + '/public'));
 
 ```javascript
 const products = app.getBusinessObject('DemoProduct');
-const productList = await products.search(null, { 
-  inlineDocuments: ['demoPrdPicture'] 
+const productList = await products.search(null, {
+  inlineDocuments: ['demoPrdPicture']
 });
 ```
 
@@ -124,8 +134,8 @@ server.get('/', async (req, res) => {
 server.get('/products', async (req, res) => {
   headers(res);
   try {
-    const prdList = await products.search(null, { 
-      inlineDocuments: ['demoPrdPicture'] 
+    const prdList = await products.search(null, {
+      inlineDocuments: ['demoPrdPicture']
     });
     res.json(prdList);
   } catch (err) {
@@ -154,7 +164,8 @@ fetch('/products')
   });
 ```
 
-## Demo Repositories
+Demo repositories
+-----------------
 
 Explore examples for different environments:
 
@@ -167,9 +178,10 @@ Explore examples for different environments:
 - **React Native**: [Mobile demo](https://github.com/simplicitesoftware/react-native-demo)
 - **Within Simplicité**: [Demo module](https://github.com/simplicitesoftware/module-demo-jslib)
 
-# Core Javascript Usage
+Core Javascript usage
+---------------------
 
-## External Objects (Embedded Widgets)
+### External Objects (Embedded Widgets)
 
 JavaScript in External Objects enables custom behaviors and Simplicité communication.
 
@@ -193,7 +205,7 @@ products.search(function(){
 }, null, {});
 ```
 
-## External Pages
+### External Pages
 
 For standalone pages, use this structure:
 
@@ -218,12 +230,12 @@ public class MyExternalObject extends ExternalObject {
     try {
       setDecoration(false);
       BootstrapWebPage wp = new BootstrapWebPage(params.getRoot(), getDisplay());
-      
+
       wp.appendAjax();
       wp.appendJSInclude(HTMLTool.getResourceJSURL(this, "CLASS"));
       wp.appendCSSInclude(HTMLTool.getResourceCSSURL(this, "STYLES"));
       wp.appendHTML(HTMLTool.getResourceHTMLContent(this, "HTML"));
-      
+
       wp.setReady(this.getName() + ".render({});");
       return wp.toString();
     } catch (Exception e) {
@@ -235,5 +247,7 @@ public class MyExternalObject extends ExternalObject {
 ```
 
 :::warning
+
 Avoid overusing JavaScript when Simplicité's native features (Business Logic, Declarative Rules, Object Hooks) can achieve the same results. This maintains compatibility and simplifies maintenance.
+
 :::

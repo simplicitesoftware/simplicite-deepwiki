@@ -219,19 +219,19 @@ be refactored as **test shared code**.
 
 To run a **deprecated** business object's unit tests, the command is:
 
-```bash
+```text
 curl <credentials> --form service=unittests --form object=<business object name> <I/O URL>
 ```
 
 To run a **deprecated** external object's unit tests, the command is:
 
-```bash
+```text
 curl <credentials> --form service=unittests --form extobject=<external object name> <I/O URL>
 ```
 
 To run a **deprecated** business process's unit tests, the command is:
 
-```bash
+```text
 curl <credentials> --form service=unittests --form process=<business process name> <I/O URL>
 ```
 
@@ -241,6 +241,6 @@ curl <credentials> --form service=unittests --form process=<business process nam
 
 To retrieve the server logs, the command is:
 
-```bash
+```text
 curl <credentials> --form service=logs <I/O URL>
 ```

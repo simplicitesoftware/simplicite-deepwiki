@@ -8,11 +8,15 @@ PDF Publications
 
 PDF publications can be generated in several ways:
 
-- using the HTML->PDF tool based on the [openhtmltopdf](https://github.com/openhtmltopdf/openhtmltopdf) library
-- using the included open source [Apache PDFBox library](https://pdfbox.apache.org/)
+- using the HTML->PDF tool (based on the [OpenHtmlToPdf](https://github.com/openhtmltopdf/openhtmltopdf) library)
+- using the `HTMLToPDFTool` helper class (or directly the included underlying open source [Apache PDFBox library](https://pdfbox.apache.org/))
+
+or for more complex/specific cases:
+
 - using a third-party Java PDF generation library, that might be more advanced than PDFBox, like [iText](https://itextpdf.com/)
-- using a third-party HTML->PDF service, that might be more advanced than openhtmltopdf, like the open source [WeasyPrint](https://weasyprint.org)
+- using a third-party HTML->PDF external service, that might be more advanced than OpenHtmlToPdf, like the open source [WeasyPrint](https://weasyprint.org)
 - using a third-party API-based PDF generation service ([ex](https://stackoverflow.com/questions/5344176/is-there-a-web-service-for-converting-html-to-pdf/5344424#5344424))
+- etc.
 
 HTML template to PDF
 --------------------
@@ -70,14 +74,40 @@ Configure a publication with:
 - **Template type** : method
 - **Method** : `pubPdf`
 
-And then implement the method (which must be of type `byte[]`) in the object's code.
+And then implement the publication method in the object's code.
 
-Example:
+Example using the `HTMLToPDFTool` wrapper class:
 
 ```Java
 package com.simplicite.objects.Demo;
 
 import com.simplicite.util.*;
+import com.simplicite.util.annotations.BusinessObjectPublication;
+import com.simplicite.util.tools.HTMLToPDFTool;
+
+/**
+ * Customer business object
+ */
+public class DemoClient extends ObjectDB {
+	public static final long serialVersionUID = 1L;
+
+	@BusinessObjectPublication
+	public Object pubPdf(PrintTemplate pt) {
+		return HTMLToPDFTool.toPDF("Hello <b>world</b>!"); // HTML
+		// return HTMLToPDFTool.markdownToPDF("My PDF", "Hello **world**!"); // Markdown
+		// etc.
+	}
+}
+```
+
+Example using directly the lower-level PDFBox lib API:
+
+```Java
+package com.simplicite.objects.Demo;
+
+import com.simplicite.util.*;
+import com.simplicite.util.annotations.BusinessObjectPublication;
+
 import org.apache.pdfbox.pdmodel.*;
 import org.apache.pdfbox.pdmodel.font.*;
 import java.io.ByteArrayOutputStream;
@@ -87,13 +117,14 @@ import java.io.IOException;
  * Customer business object
  */
 public class DemoClient extends ObjectDB {
-	private static final long serialVersionUID = 1L;
+	public static final long serialVersionUID = 1L;
 
-	//inspiration : https://www.tutorialspoint.com/pdfbox/
-	public byte[] pubPdf(){
+	// inspiration : https://www.tutorialspoint.com/pdfbox/
+	@BusinessObjectPublication
+	public Object pubPdf(PrintTemplate pt) {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-		try{
+		try {
 			// init
 			PDDocument document = new PDDocument();
 			PDPage page = new PDPage();
@@ -111,8 +142,7 @@ public class DemoClient extends ObjectDB {
 			// save
 			document.save(byteArrayOutputStream);
 			document.close();
-		}
-		catch(IOException e){
+		} catch(IOException e) {
 			AppLog.error(getClass(), "pubPdf", "Error creating PDF", e, getGrant());
 		}
 

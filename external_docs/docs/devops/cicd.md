@@ -1,5 +1,5 @@
 ---
-sidebar_position: 200
+sidebar_position: 330
 title: CI/CD
 unlisted: true
 ---
@@ -15,6 +15,53 @@ CI/CD
 
 This document focuses on an example based on a **Gitlab + Portainer** infrastructure,
 but is easily portable to other code versioning and orchestration tools (Github, Kubernetes, SIM, etc.).
+
+```mermaid
+sequenceDiagram
+    autonumber
+
+    actor Dev as Developer
+    participant DevInst as Dev Simplicité instance
+    participant LocalRepo as Local Git repo
+    participant Gitlab as Gitlab
+    participant TestInst as Test Simplicité instance
+    participant Sonar as SonarCloud
+
+    rect rgb(230,230,250)
+        note right of Dev: 1. Versionning
+        Dev->>DevInst: Create module, edit configuration
+        DevInst-->>LocalRepo: Expose module Git repository
+        LocalRepo->>DevInst: git clone / pull from Dev instance
+
+        Dev->>LocalRepo: Edit code, CI, compose and other non-configuration files
+        LocalRepo->>DevInst: git push
+        LocalRepo->>Gitlab: git push
+    end 
+
+    Gitlab-->>Gitlab: Trigger pipeline
+
+    rect rgb(230,230,250)
+        note right of Gitlab: 2. Deploy test instance
+        Gitlab->>TestInst: Deploy test instance (portainer + importspec)
+        TestInst-->>Dev: Test instance available (healthy, module pre-installed)
+    end
+
+    rect rgb(220,245,220)
+        note right of Gitlab: 3. Run unit tests
+        Gitlab->>TestInst: Run unit tests (IO service on test instance)
+        TestInst-->>Gitlab: JUnit results
+        Gitlab-->>Gitlab: Get code coverage data (if applies)
+    end
+
+    rect rgb(220,235,245)
+        note right of Gitlab: 4. Code quality / 5. Code coverage
+        Gitlab->>Gitlab: mvn validate (eslint, stylelint, jshint, checkstyle)
+        Gitlab->>Sonar: sonar-maven-plugin:sonar (projectKey, organization, Jacoco report path if applies)
+        Sonar-->>Gitlab: Analysis status & quality gate
+    end
+
+    Sonar-->>Dev: Review quality, coverage, issues
+```
 
 Prerequisites
 --------------
@@ -66,10 +113,6 @@ cd MyApp
 git remote add gitlab https://gitlab.com/simplicite-gitlab-group/module-myapp
 git push -u gitlab master
 ```
-
-:::danger
-do not forget to add checkstyle at some point in the doc
-:::
 
 2- Deploy test instance
 -----------------------
@@ -205,26 +248,6 @@ Remember, if debugging of `simci` is ever needed, use local executiong with `tes
 instead of gitlab runners for quicker testing.
 :::
 
-:::danger
-
-DOES NOT FAIL IN GITLAB WHEN JOB FAILS
-
-```text
-[sim-cicd] Successfully installed jq
-[sim-cicd] === RUN UNIT TESTS
-INFO: Executing unit tests MyappTests of module MyApp...
-ERROR: Error during execution of unit tests MyappTests of module MyApp: Failure of 1 tests
-java.lang.AssertionError
-	at org.junit.Assert.fail(Assert.java:87)
-	at org.junit.Assert.assertTrue(Assert.java:42)
-	at org.junit.Assert.assertTrue(Assert.java:53)
-	at com.simplicite.tests.MyApp.MyappTests.test(MyappTests.java:23)
-Cleaning up project directory and file based variables 00:00
-Job succeeded
-```
-
-:::
-
 3- Sonar & Code quality
 ---------------------
 
@@ -315,13 +338,24 @@ sonarcloud-check:
     - if: '$SONARCLOUD_ENABLED'
 ```
 
-:::danger
-There is a problem in the free tier: we can only analyse the long term branch, which was probably set as `main` because of an empty project?
-Then it's difficult to change it to `master`.
+:::info
+Sometimes, on first analysis, Sonarcloud can set the "main branch" a something different than you actual main branch (usually `master`).
+It's problematic on the free tier where Sonarcloud will only analyze that branch.
+If that happens, delete the project on Sonarcloud, recreate it, update the token, and run another analysis.
 :::
 
 4- Jacoco code coverage
 ------------------------
+
+### Simplicité
+
+Update module settings, and add the following line to the `sonar` section:
+
+```json
+"coverage.exclusions": "resources/**.js"
+```
+
+Commit (and pull changes locally)
 
 ### Docker configuration
 
@@ -350,12 +384,14 @@ networks:
 
 ### Pipeline configuration
 
+- call `portainer-stack-get-coverage` at the end of unit test execution job
 - instruct Gitlab to keep the jacoco file after unit tests have run
 - attach that file to the sonar run with `-Dsonar.coverage.jacoco.xmlReportPaths=jacoco.xml`
 
 ```yaml
 unit-tests:
   [...]
+    - ./others/simci portainer-stack-get-coverage -v gitlab-test-myapp $PORTAINER_URL
   artifacts:
     paths:
       - jacoco.xml
@@ -364,7 +400,7 @@ unit-tests:
 sonarcloud-check:
   script:
     [...]
-    - mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=<replace_project_key> -Dsonar.coverage.jacoco.xmlReportPaths=jacoco.xml
+    - mvn verify [...] -Dsonar.coverage.jacoco.xmlReportPaths=jacoco.xml
   rules:
 ```
 
@@ -446,7 +482,8 @@ tree -a -I \.git
 	"sonar": {
 		"projectKey": "simplicite-gitlab-group_module-myapp",
 		"organization": "simplicite-gitlab",
-		"host.url": "https://sonarcloud.io"
+		"host.url": "https://sonarcloud.io",
+		"coverage.exclusions": "resources/**.js"
 	}
 }
 ```

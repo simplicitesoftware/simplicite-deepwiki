@@ -1,7 +1,6 @@
 ---
 sidebar_position: 330
 title: CI/CD
-unlisted: true
 ---
 
 CI/CD
@@ -333,7 +332,7 @@ sonarcloud-check:
   script:
     - apk update && apk add nodejs npm
     - ls -halt
-    - mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=<replace_project_key>
+    - mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
   rules:
     - if: '$SONARCLOUD_ENABLED'
 ```

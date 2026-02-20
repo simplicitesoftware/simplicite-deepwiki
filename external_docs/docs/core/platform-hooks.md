@@ -10,18 +10,34 @@ This document describes the hooks that can be implemented to put some **addition
 
 :::warning
 
-**Important**: As of version 5.0, static grant hooks are **deprecated**, they are replaced by the platform hooks singleton with same methods.
+As of version 5.0, the static grant hooks are **deprecated**, they are replaced by the platform hooks with same methods signatures.
 
-**Rhino** scripting language is no longer supported in Simplicité version 6.0+.
+This document gives only platform hooks implementation examples but they can be easily transposed from/to the corresponding legacy static grant hooks.
 
-This document describes `PlatformHooks` implementation examples but it can be directly transposed to legacy `GrantHooks`.
-
-None of these hooks **needs** to be implemented. You can implement one or several of these hooks if you want
-to apply out some dynamic business logic that goes beyond what can be configured.
-
-These hooks are located in the singleton shared code named `PlatformHooks`.
+The Rhino scripting language is no longer supported as of Simplicité version 6.0, if you have legacy grant hooks implemented in this language
+and plan to upgrade from v5 to v6, you must transpose them as Java platform hooks
 
 :::
+
+:::info
+
+None of these hooks **needs** to be implemented. You can implement one or several of these hooks **only** if you want
+to apply out some dynamic business logic that goes beyond what can be configured.
+
+:::
+
+Introduction
+------------
+
+All the platform hooks must be implemented in custom Java "shared code(s)" which name is or starts with `PlatformHooks`, e.g.
+
+```java
+package com.simplicite.commons.MyModule;
+
+public class PlatformHooks /* or PlatformHooksForMyModule */ extends com.simplicite.util.engine.PlatformHooksInterface {
+	// Place your platform hooks overrides here
+}
+```
 
 Platform init hook
 -------------------
@@ -66,9 +82,9 @@ flowchart TD
     E-->F
     F-->G1
     G1-->G
-    A0(customAuth)
+    A0("customAuth")
     A("parseAuth (extract login)")
-    B(preAuth)
+    B("preAuth")
     D("postAuth")
     E("preLoadGrant")
     F("postLoadGrant")
@@ -113,6 +129,49 @@ public void customHealthCheck(HttpServletRequest request, HttpServletResponse re
 	ServletTool.success(request, response, new JSONObject()
 		.put("status", "OK")
 		.put("date", Tool.toDatetime(new Date())));
+}
+```
+
+User authentication hooks
+-------------------------
+
+### `customAuth`
+
+This platform hook is dedicated to implement a custom authentication mechanism when the standard out-of-the box
+SAML/Oauth2/OpenIDConnect/SAML/... mechanisms does not fit your requirement.
+
+:::warning
+
+Never use this hook to implement specifically one of the above standard mechanism.
+:::
+
+### `preAuth`&amp; `postAuth`
+
+These two hooks can be used to implement custom processing **before** and/or **after** the authentication.
+E.g.:
+
+- requiring some additional context form an external system before authentication
+- notifying an external system after authentication
+- etc.
+
+Practically speaking their usage is rather rare.
+
+### `parseAuth`
+
+The `parseAuth` platform hook allow you to use the received data from the authentication (e.g. from an external authentication system)
+to return an actual existing user's login:
+
+```java
+@Override
+public String parseAuth(Grant sys, SessionInfo info) {
+	try {
+		String login = info.getLogin();
+		// Do something with login (e.g. trim the @<domain> from an email)
+		return login;
+	} catch (Exception e) {
+		AppLog.error(e, sys);
+		return super.parseAuth(sys, info);
+	}
 }
 ```
 

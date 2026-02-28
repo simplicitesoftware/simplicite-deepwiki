@@ -373,6 +373,15 @@ JAR to the platform otherwise (e.g. by copying it into the `WEB-INF/lib` dir or 
 
 :::
 
+:::tip
+
+If you don't want to depend **only** on a JVM property for disabling the compilation capabilities of the platform
+you can **also** remove the compiler JAR (`WEB-INF/lib/ecj-<x.y.z>.jar`) from the webapp.
+
+Don't do it if the compilation is not disabled as described above.
+
+:::
+
 #### Websockets
 
 The `/ui/<events|lsp|...>` endpoints provides websocket services to provide client-side access to some server-side services: logs, LSP, etc.
@@ -447,10 +456,15 @@ These are specific guidelines for the Simplicité Instances Manager (SIM). See [
 
 ### SIM credentials
 
-Strong passwords must be used for SIM users passwords (for UI and API access). Better, SSL client certificates should be used for authentication.
+Strong passwords must be used for SIM users passwords (for UI and API access).
+Better, SSL client certificates should be used for authentication instead of username/password.
+
 When connecting over SSH, only secured SSH keys should be used.
 
-### Web-based terminal access
+### SIM access
 
-The web-based terminal access (ShellInABox) should not be enabled unless it is **absolutely** needed
-(keep in mind it is a rather insecure feature that only makes sense on a non-production, highly secured infrastructure).
+If you don't use them, disable the UI and the APIs access of the SIM
+(the UI relies on the APIs so disabling APIs and not the UI does not make sense).
+
+If you have disabled the UI and the API access you are still able to manage your instances using the CLI from a terminal over SSH
+(some advanced features of the SIM are not available thru the UI or the APIs anyway).

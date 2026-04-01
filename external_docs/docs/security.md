@@ -342,10 +342,12 @@ The scope of the features depends on the major version of the platform, see the 
 
 Even if development mode is enabled some features may not be relevant anyway, in particular:
 
-- Database access: to do so, the grants on the `DBAccess/DBDocAccess` external objects' function can be deactivated or deleted
-- Logs viewer page: to do so, the grants on the `LogAccess` external object's function can be deactivated or deleted
+- Database access: the grants on the `DBAccess/DBDocAccess` external objects' function can be deactivated or deleted
+- Logs viewer page: the grants on the `LogAccess` external object's function can be deactivated or deleted
 - Logs forwarded to the browser's console, this can be inhibited by setting the `USE_WEBSOCKETS_LOGS` to `no` for all users
   (by default this system parameter is only enabled for the `designer` user)
+- SQL-level adapter: `SQLScript` which is restricted to operation profile but can be safely deleted
+- Etc.
 
 These external objects can also simply be deleted, but this should not be done if the possibility to use these tools
 for punctual maintenance/investigation activities needs to be kept.

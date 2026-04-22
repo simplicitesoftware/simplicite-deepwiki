@@ -17,54 +17,60 @@ by using functional keys instead of technical IDs...
 
 [Learn more](/make/project/datasets)
 
-Configuring an "export order" for the objects
----------------------------------------------
+Creating the dataset
+--------------------
 
-To configure an "export order" for the **TrnClient** object, follow the steps below:
+1. In the **Project > Datasets** menu, click **Create**
+   ![](img/datasets/dataset-list.png)
+2. Pick a **Module** and a **Name** for your dataset
+   ![](img/datasets/create-dataset.png)
+3. Click **Save**
 
-1. In the **Business objects > Business objects** menu, open **TrnClient**
-2. Click **More**
-   > This displays the Fields defined as _extended_
-3. Fill in the object's information like so:
-   - Export order : **10**
-   ![](img/datasets/export-order.png)
-4. Click **Save**
+Your dataset is now created, the default **export specifications** are XML format & unzipped file.
 
-Repeat the steps above for:
+If you leave the dataset as it is, all of your datas will be included in it with no specified order.
 
-- **TrnSupplier** :
-  - Export order : **20**
-- **TrnProduct** :
-  - Export order : **30**
-- **TrnOrder** :
-  - Export order : **40**
+> Note that the export could work, but most of the times a dataset serves to create specific datas, and thus we still need to do a few things.
 
-TrnSupplier has a lower export order than TrnProduct because its data must be added to the dataset **before** TrnProduct's data.
-TrnOrder is exported last because its data depends of TrnProduct, TrnSupplier and TrnClient
+Configuring the dataset
+-----------------------
 
-Generating the Dataset
-----------------------
+### Selecting the data
 
-To generate the Dataset, follow the steps below:
+In our case we will export our 4 objects **TrnSupplier**, **TrnProduct**, **TrnClient** and **TrnOrder**, following the steps below :
 
-1. In the **Project > Modules** menu, open **Training**
-2. Click **Export data** in the "Import/Export" panel
-   ![](img/datasets/export-data.png)
-3. In the confirmation dialog, set :
-   - Format : **xml**
-   - Zipped : **no**
-   ![](img/datasets/confirm.png)
-4. Click **Confirm**
-5. Close the Export data modal
+1. On the **Dataset objects** list, click **Create on list**, then click the loop icon next to the **Business object** field.
+   ![](img/datasets/create-dto-0.png)
+   ![](img/datasets/create-dto-1.png)
+2. From the **Select Business object** list that appears, click the **TrnOrder** object to select it.
+   ![](img/datasets/select-object.png)
+3. Back to the **Dataset objects** click save
+   ![](img/datasets/save-dto.png)
+4. Now repeat the steps 1 to 3 until you have all 4 objects.
+5. Click **Close** in the **Dataset objects** list's header.
+   ![](img/datasets/close-dto.png)
 
-### Expected Result
+We now have specified the data that will be included in the dataset.
+And the **Order** columns shows the specific order the objects will be imported when the dataset is played.
 
-1. The export is available the the **Dataset** panel
-   ![](img/datasets/export-success.png)
-2. Click the "File" icon
-   ![](img/datasets/file-icon.png)
-3. A preview of the XML file is displayed
-   ![](img/datasets/export-xml.png)
+But as our objects have links between eachother, we need to pay attention to the order they're gonna be imported in.
+
+> if the **TrnOrder** objects are imported referring a **TrnProduct** or **TrnClient** that wasn't imported yet, the data import will fail.
+
+### Ordering the data
+
+To re-order the rows in the desired order : **TrnClient** / **TrnSupplier** / **TrnProduct** / **TrnOrder**.
+
+We will use the drag & drop feature, so you can use the dotted handles to drag the object rows in the final order that we want.
+
+![](img/datasets/reorder-objects-0.png)
+![](img/datasets/reorder-objects-1.png)
+
+Once this is done, click **Save** in the Dataset's form header. Then create the dataset file by clicking on the **Export data** action button.
+
+![](img/datasets/export-data-bis.png)
+
+> Everything is now ready for the dataset to be "played" and thus all the data imported, but as it already exists, we'll first have to delete it.
 
 Deleting data and importing the Dataset
 ---------------------------------------
@@ -80,7 +86,7 @@ To delete existing Orders, follow the steps below:
    ![](img/datasets/delete-rows.png)
 4. Click **Ok**
 
-Repeat the steps above to delete existing Products, Suppliers and Clients
+Repeat the steps above to delete existing Products, Suppliers and Clients.
 
 ### Importing the Dataset
 

@@ -205,10 +205,26 @@ Settings that apply to the object as a whole, whatever its views.
 
 <!-- TODO: Complete the features from notes & observations -->
 
-Alternative views are all <rgaa-nc>Non-Compliant</rgaa-nc> and must not be enabled: pivot tables,
-agendas, place maps, time sheets and tree views.
-
 <!-- TODO: In practice — screenshots of the object settings, OK/NOK -->
+
+#### Objects Rendering
+
+| Feature | Status | Context | Setting | Notes |
+| --- | --- | --- | --- | --- |
+| Searches | <rgaa-pc>PC</rgaa-pc> | User Interface | — | |
+| Publications | <rgaa-nc>NC</rgaa-nc> | User Interface | — | |
+| Pivot Tables | <rgaa-nc>NC</rgaa-nc> | User Interface | — | |
+| Agendas | <rgaa-nc>NC</rgaa-nc> | User Interface | — | |
+| Places maps | <rgaa-nc>NC</rgaa-nc> | User Interface | — | |
+| Time sheets | <rgaa-nc>NC</rgaa-nc> | User Interface | — | |
+
+<!-- TODO: Complete the features from notes & observations -->
+
+#### Treeviews
+
+<rgaa-pc>Partially Compliant</rgaa-pc>.
+
+Only the _docked_ version of treeviews is compliant, the one rendered in the menu is not.
 
 ### Lists
 
@@ -334,7 +350,7 @@ contrast with the header background, not only with its own label.
 
 | Feature | Status | Context | Setting | Notes |
 | --- | --- | --- | --- | --- |
-| Left menu | <rgaa-c>C</rgaa-c> | System parameter | `MENU_SETTINGS` — `left.collapse: "none"` | |
+| Left menu | <rgaa-c>C</rgaa-c> | System parameter | — | |
 | Top menu | <rgaa-nc>NC</rgaa-nc> | System parameter | `MENU_SETTINGS` — `top.active = false` | Chained popups break keyboard navigation |
 | Trays | <rgaa-nc>NC</rgaa-nc> | Business Object | `obo_tray = no` | Drag-and-drop only. Applies to every object with a status |
 | Metrics | <rgaa-nc>NC</rgaa-nc> | Business Object | `obo_dashboard = none` | Applies to every object with a status |

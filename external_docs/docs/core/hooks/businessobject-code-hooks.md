@@ -1,6 +1,6 @@
 ---
 sidebar_position: 30
-title: Objects code hooks
+title: Business objects
 ---
 
 Business objects hooks
@@ -36,8 +36,8 @@ However, this document organizes them into four main categories:
 
 Extra sources of documentation and examples:
 
-- [basic code examples](/docs/core/basic-code-examples)
-- [advanced code examples](/docs/core/advanced-code-examples)
+- [basic code examples](/docs/core/codexamples/basic-code-examples)
+- [advanced code examples](/docs/core/codexamples/advanced-code-examples)
 - [forum](https://communicty.simplicite.io)
 - [github](https://github.com/simplicitesoftware)
 - [Javadoc](https://platform.simplicite.io/current/javadoc/com/simplicite/util/ObjectDB.html)
@@ -228,7 +228,7 @@ public boolean isActionEnable(String[] row, String action) {
 }
 ```
 
-> See [this document](/docs/core/custom-actions-examples) for details on how to implement custom actions.
+> See [this document](/docs/core/codexamples/custom-actions-examples) for details on how to implement custom actions.
 
 ### Publication processing right enabling/disabling hook
 
@@ -259,10 +259,23 @@ This hook is called when building the list of possible state transition. It may 
 ```java
 @Override
 public boolean isStateTransitionEnable(String fromStatus, String toStatus) {
-    // In this example above the transition between `PENDING` state and `VALIDATED` statuses is dynamically allowed to users of `MYGROUP`:
+    // In this example the transition between `PENDING` state and `VALIDATED` statuses is dynamically allowed if the value of the `objField1` field is `myAssertionValue`:
     if ("PENDING".equals(fromStatus) && "VALIDATED".equals(toStatus))
-        return getGrant().hasResponsibility("MYGROUP");
+        return "myAssertionValue".equals(getFieldValue("objField1"));
     return true;
+}
+```
+
+The `preStateTransition` hook is called just before pre validate hook in the case of a state transition.
+
+```java
+@Override
+public List<String> preStateTransition(String fromStatus, String toStatus) {
+    List<String> msgs = new ArrayList<String>();
+    // In this example, the state transition is prevented if the value of the `objField1` field is empty:
+    if (("PENDING".equals(fromStatus) && "VALIDATED".equals(toStatus)) && Tool.isEmpty(getFieldValue("objField1")))
+        msgs.add(Message.formatError("ERR_TEST0", "Missing value for field", "objField1")); // Field error message
+    return msgs;
 }
 ```
 

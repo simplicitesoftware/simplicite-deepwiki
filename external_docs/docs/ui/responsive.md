@@ -103,37 +103,49 @@ In accessibilty mode, this feature is disabled and the user will always work in 
 Each work-area has an isolated navigation tab to work on several objects at the same time:
 
 - Objects are instantiated per navigation.
-- The first one is not suffixed to be compliant with the legacy V6.
+- The first instance name is not suffixed to be compliant with the legacy V6.
 - the others are suffixed with the navigation uniqueId:
 
 | Work‑area         | Navigator uniqueId | BO instance name (example) |
 |-------------------|--------------------|----------------------------|
-| first / default   | undefined `$nav`   | `the_ajax_Client`          |
+| first / default   | undefined          | `the_ajax_Client`          |
 | 2nd area (id 1)   | `_nav1`            | `the_ajax_Client_nav1`     |
 | nth area (id n)   | `_nav<n>`          | `the_ajax_Client_nav<n>`   |
 
 In the user preferences dropdown, when both modes are available,
 the user can switch from single work area to multiple work areas.
 
-Each user navigation is stored per user/scope
+Each user navigation is stored per user/scope in a JSON format
 in a user system parameter named `WORKAREA-<MONO|MULTI> <scope> <login>`,
-and will be restored in several conditions on UI reload:
+and will be restored in some cases after exiting the UI:
 
 | Exit type            | Single work-area | Multi work-area |
 |----------------------|------------------|-----------------|
 | logout (Quit)        | home page        | restore(*)      |
 | change language      | restore          | restore         |
-| reload / F5          | restore          | restore         |
+| page reload / F5     | restore          | restore         |
 | switch scope         | home page        | restore         |
 | switch user          | home page        | restore         |
 | clear cache          | home page        | restore         |
 
-(*) The navigation JSON serialization is in best effort,
-because every UI component/widget states are not fully serializable.
+(*) The serialization of UI states is in best effort,
+because component/widget states are not fully serializable:
 
-- Restoration is useful to return to the same work area after a reload,
-  but not to restore a previous session.
-- For example, a list will restore the current filters but will lose any unsaved updates.
+- Restoration is useful to return to the same global work area disposition after a reload,
+  but not to restore the previous session literally.
+- For example, a list will restore the last filters and pagination but will lose any unsaved updates.
+
+Simplicité UI API always use selectors based on class name or data attributes in the work area container (`ctn` is always passed to the functions).
+
+- fields are now selected by their `name` attribute, which is unique per form/row, so they are not impacted by this change.
+- when IDs are required by HTML syntax (ex `<label for="myField">`), the UI will use a suffix to make IDs unique per work-area.
+  So work IDs are not deterministic anymore and should not be used in the application code.
+
+To use the multi work-area mode, the application code should:
+
+- use selector based on container context: ex `$(".myWidget", ctn)` instead of `$("#myWidget")`.
+- use `$ui.getField(ctn, obj, "myField", index)` to access fields in the container instead of `$("#field_myField")`.
+- to avoid conflicts between work areas using several instances of the same component.
 
 Global properties
 -----------------
